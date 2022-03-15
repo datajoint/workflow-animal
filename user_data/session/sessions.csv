@@ -1,4 +1,4 @@
-subject,project,session_datetime,session_dir,session_note
-subject5,ProjA,2020-04-15 11:16:38,/subject5/session1,'Successful data collection, no notes'
-subject5,ProjA,2020-05-12 04:13:07,subject5\session1,'Data collection notes'
-subject6,ProjA,2021-06-02 14:04:22,/subject6/session1,'Ambient temp abnormally low'
+subject,project,session_datetime,session_dir,session_note,user
+subject3,ProjA,2020-05-12 04:13:07,subject3\session1,'Data collection notes',User1
+subject5,ProjA,2018-07-03 20:32:28,/subject5/session1,'Successful data collection - no notes',User1
+subject6,ProjA,2021-06-02 14:04:22,/subject6/session1,'Ambient temp abnormally low',User2

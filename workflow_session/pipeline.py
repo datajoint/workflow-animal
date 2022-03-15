@@ -9,7 +9,7 @@ from element_animal.genotyping import Sequence, BreedingPair, Cage,\
                                       SubjectCaging, GenotypeTest
 from element_lab.lab import Source, Lab, Protocol, User, Project, ProjectUser, \
                                                   ProjectKeywords, ProjectPublication, ProjectSourceCode
-from element_session.session import Session, SessionDirectory, SessionExperimenter, \
+from element_session.session_with_datetime import Session, SessionDirectory, SessionExperimenter, \
                                                                  SessionNote, ProjectSession
 
 if 'custom' not in dj.config:
@@ -27,6 +27,9 @@ __all__ = ['genotyping', 'session', 'Subject', 'Source', 'Lab', 'Protocol', 'Use
 lab.activate(db_prefix + 'lab')
 
 subject.activate(db_prefix + 'subject', linking_module=__name__)
+
+from element_animal.export.nwb import subject_to_nwb
+from element_lab.export.nwb import element_lab_to_nwb_dict
 
 Experimenter = lab.User
 session.activate(db_prefix + 'session', linking_module=__name__)

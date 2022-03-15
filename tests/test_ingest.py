@@ -21,9 +21,9 @@ def test_ingest_lab(pipeline, ingest_lab,
     """Check length of various lab schema tables"""
     lab = pipeline['lab']
     assert len(lab.Lab()) == 2, f'Check Lab: len={len(lab.Lab())}'
-    assert len(lab.LabMembership()) == 4, \
+    assert len(lab.LabMembership()) == 5, \
         f'Check LabMembership: len={len(lab.LabMembership())}'
-    assert len(lab.User()) == 4, f'Check User: len={len(lab.User())}'
+    assert len(lab.User()) == 5, f'Check User: len={len(lab.User())}'
     assert len(lab.UserRole()) == 3, f'Check UserRole: len={len(lab.UserRole())}'
     assert len(lab.Location()) == 2, f'Check Location: len={len(lab.Location())}'
     assert len(lab.Project()) == 2, f'Check Project: len={len(lab.Project())}'
@@ -56,7 +56,7 @@ def test_ingest_lab(pipeline, ingest_lab,
 def test_ingest_subjects(pipeline, subjects_csv, subjects_part_csv, ingest_subjects):
     """Check length of subject.Subject"""
     subject = pipeline['subject']
-    assert len(subject.Subject()) == 2, f'Check Subject: len={len(subject.Subject())}'
+    assert len(subject.Subject()) == 3, f'Check Subject: len={len(subject.Subject())}'
     assert len(subject.Subject.Protocol()) == 2, \
         f'Check Subject.Protocol: len={len(subject.Subject.Protocol())}'
     assert len(subject.Subject.User()) == 2, \

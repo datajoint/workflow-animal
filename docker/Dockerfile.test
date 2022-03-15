@@ -1,8 +1,8 @@
-FROM datajoint/djlab:py3.8-debian
+FROM datajoint/djbase:py3.9-debian-fcd8909
 
 USER anaconda:anaconda
 
-COPY ./workflow-session/apt_requirements.txt /tmp/
+COPY ./workflow-session/docker/apt_requirements.txt /tmp/
 RUN /entrypoint.sh echo "Installed dependencies."
 WORKDIR /main/workflow-session
 

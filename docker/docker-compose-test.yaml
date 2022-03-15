@@ -1,23 +1,23 @@
 # export COMPOSE_DOCKER_CLI_BUILD=0 # some machines need for smooth --build
-# docker-compose -f docker-compose-test.yaml up --build
-# docker exec -it workflow-session_workflow_1 /bin/bash
-# docker-compose -f docker-compose-test.yaml down
+# docker-compose -f ./docker/docker-compose-test.yaml up --build
+# docker exec -it docker-session-test-workflow-1 /bin/bash
+# docker-compose -f ./docker/docker-compose-test.yaml down
 
 version: "2.4"
 x-net: &net
   networks:
       - main
 services:
-  db:
+  session-test-db:
     <<: *net
     image: datajoint/mysql:5.7
     environment:
       - MYSQL_ROOT_PASSWORD=simple
-  workflow:
+  session-test-workflow:
     <<: *net
     build:
-      context: ../
-      dockerfile: ./workflow-session/Dockerfile.test
+      context: ../../
+      dockerfile: ./workflow-session/docker/Dockerfile.test
     env_file: .env
     image: workflow_session_test:0.0.0b2
     environment:
@@ -34,12 +34,12 @@ services:
         tail -f /dev/null
     volumes:
       - ./apt_requirements.txt:/tmp/apt_requirements.txt
-      - ../element-lab:/main/element-lab
-      - ../element-animal:/main/element-animal
-      - ../element-session:/main/element-session
-      - .:/main/workflow-session
+      - ../../element-lab:/main/element-lab
+      - ../../element-animal:/main/element-animal
+      - ../../element-session:/main/element-session
+      - ..:/main/workflow-session
     depends_on:
-      db:
+      session-test-db:
         condition: service_healthy
 networks:
   main:

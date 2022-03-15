@@ -23,7 +23,7 @@ def test_generate_pipeline(pipeline):
         subject.Subject.Lab.full_table_name
 
     # test connection Subject -> schema children
-    session_tbl, _, subject_line_tbl, subject_protocol_tbl, subject_source_tbl, \
+    _, _, _, _, _, session_tbl, _, subject_line_tbl, subject_protocol_tbl, subject_source_tbl, \
         subject_strain_tbl, subject_user_tbl, subject_cull_tbl, subject_death_tbl,\
         subject_zygotsity_tbl = subject.Subject.children(as_objects=True)
     assert session_tbl.full_table_name == session.Session.full_table_name
