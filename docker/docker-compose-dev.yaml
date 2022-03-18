@@ -6,18 +6,20 @@ x-net: &net
   networks:
       - main
 services:
-  session-dev-db:
+  db:
     <<: *net
     image: datajoint/mysql:5.7
+    container_name: workflow-session-dev-db
     environment:
       - MYSQL_ROOT_PASSWORD=simple
-  session-dev-workflow:
+  workflow:
     <<: *net
     build:
       context: ../../
       dockerfile: ./workflow-session/docker/Dockerfile.dev
     env_file: .env
-    image: workflow_session_dev:0.0.0b2
+    image: workflow-session-dev:0.0.0b2
+    container_name: workflow-session-dev
     volumes:
       - ./apt_requirements.txt:/tmp/apt_requirements.txt
       - ../../element-lab:/main/element-lab
@@ -25,7 +27,7 @@ services:
       - ../../element-session:/main/element-session
       - ..:/main/workflow-session
     depends_on:
-      session-dev-db:
+      db:
         condition: service_healthy
 networks:
   main:
