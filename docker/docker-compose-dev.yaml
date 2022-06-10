@@ -18,7 +18,7 @@ services:
       context: ../../
       dockerfile: ./workflow-session/docker/Dockerfile.dev
     env_file: .env
-    image: workflow-session-dev:0.0.0b2
+    image: workflow-session-dev:0.1.0
     container_name: workflow-session-dev
     volumes:
       - ./apt_requirements.txt:/tmp/apt_requirements.txt

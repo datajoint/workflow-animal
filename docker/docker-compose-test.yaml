@@ -20,7 +20,7 @@ services:
       context: ../../
       dockerfile: ./workflow-session/docker/Dockerfile.test
     env_file: .env
-    image: workflow-session-test:0.0.0b2
+    image: workflow-session-test:0.1.0
     container_name: workflow-session-test
     environment:
       - DJ_HOST=db
