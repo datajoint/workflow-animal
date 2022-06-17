@@ -16,7 +16,7 @@ def test_generate_pipeline(pipeline):
     lab = pipeline["lab"]
 
     # test connection Lab->schema children, and Lab->Subject.Lab
-    lab_membership, loc_tbl, subject_lab_tbl = lab.Lab.children(as_objects=True)
+    loc_tbl, lab_membership, subject_lab_tbl = lab.Lab.children(as_objects=True)
     assert lab_membership.full_table_name == lab.LabMembership.full_table_name
     assert loc_tbl.full_table_name == lab.Location.full_table_name
     assert subject_lab_tbl.full_table_name == subject.Subject.Lab.full_table_name
@@ -24,21 +24,21 @@ def test_generate_pipeline(pipeline):
     # test connection Subject -> schema children
     subj_children_link = subject.Subject.children(as_objects=True)
     subj_children_list = [
+        subject.Subject.Protocol,
+        subject.Subject.User,
+        subject.Subject.Line,
+        subject.Subject.Strain,
+        subject.Subject.Source,
+        subject.Subject.Lab,
+        subject.SubjectDeath,
+        subject.SubjectCullMethod,
+        subject.Zygosity,
+        session.Session,
         genotyping.BreedingPair.Father,
         genotyping.BreedingPair.Mother,
-        genotyping.GenotypeTest,
-        genotyping.SubjectCaging,
         genotyping.SubjectLitter,
-        session.Session,
-        subject.Subject.Lab,
-        subject.Subject.Line,
-        subject.Subject.Protocol,
-        subject.Subject.Source,
-        subject.Subject.Strain,
-        subject.Subject.User,
-        subject.SubjectCullMethod,
-        subject.SubjectDeath,
-        subject.Zygosity,
+        genotyping.SubjectCaging,
+        genotyping.GenotypeTest,
     ]
 
     for child_link, child_list in zip(subj_children_link, subj_children_list):

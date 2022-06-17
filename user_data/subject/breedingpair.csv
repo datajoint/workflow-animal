@@ -1,6 +1,6 @@
 subject,line,breeding_pair,bp_start_date,bp_end_date,father,mother,litter_birth_date,num_of_pups,weaning_date,num_of_male,num_of_female
-subject5,Black 6,1/2,2019-10-15,2020-10-30,subject1,subject2,2020-10-20,2,2020-10-30,1,1
-subject6,Black 6,1/2,2019-10-15,2020-10-30,subject1,subject2,2020-10-20,2,2020-10-30,1,1
-subjectX,Brown 6,5/6,2019-12-31,2020-01-02,subject5,subject6,2020-01-01,3,2020-01-02,2,1
-subjectY,Brown 6,5/6,2019-12-31,2020-01-02,subject5,subject6,2020-01-01,3,2020-01-02,2,1
-subjectZ,Brown 6,5/6,2019-12-31,2020-01-02,subject5,subject6,2020-01-01,3,2020-01-02,2,1
+subject5,C57BL/6J,C57_BP_001,2019-10-15,2020-10-30,subject5,subject6,2020-10-20,2,2020-10-30,1,1
+subject6,C57BL/6J,C57_BP_001,2019-10-15,2020-10-30,subject5,subject6,2020-10-20,2,2020-10-30,1,1
+subjectX,Drd1a-Cre,Drd_BP_001,2019-12-31,2020-01-02,subjectX,subjectY,2020-01-01,3,2020-01-02,2,1
+subjectY,Drd1a-Cre,Drd_BP_001,2019-12-31,2020-01-02,subjectX,subjectY,2020-01-01,3,2020-01-02,2,1
+subjectZ,Drd1a-Cre,Drd_BP_001,2019-12-31,2020-01-02,subjectX,subjectY,2020-01-01,3,2020-01-02,2,1

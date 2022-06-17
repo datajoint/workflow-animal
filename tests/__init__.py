@@ -15,7 +15,7 @@ __all__ = ["pipeline"]
 
 # ------------------- SOME CONSTANTS -------------------
 
-_tear_down = False
+_tear_down = True
 verbose = False
 
 pathlib.Path("./tests/user_data").mkdir(exist_ok=True)
@@ -85,16 +85,21 @@ def pipeline():
 
     if _tear_down:
         if verbose:
+            pipeline.genotyping.BreedingPair.delete()
             pipeline.subject.Subject.delete()
+            pipeline.subject.Line.delete()
             pipeline.session.Session.delete()
             pipeline.lab.Lab.delete()
         else:
             with QuietStdOut():
+                pipeline.genotyping.BreedingPair.delete()
                 pipeline.subject.Subject.delete()
+                pipeline.subject.Line.delete()
                 pipeline.session.Session.delete()
                 pipeline.lab.Lab.delete()
 
 
+# Lab fixtures
 @pytest.fixture
 def lab_csv():
     """Create a 'labs.csv' file"""
@@ -274,7 +279,7 @@ def ingest_lab(
     return
 
 
-# Subject data and ingestion
+# Subject Fixtures
 @pytest.fixture
 def subjects_csv():
     """Create a 'subjects.csv' file"""
@@ -299,8 +304,8 @@ def subjects_part_csv():
     """Create a 'subjects_part.csv for Subject part tables"""
     subject_part_content = [
         "subject,protocol,user,line,strain,source,lab",
-        "subject6,ProtA,User1,Black 6,B6,Provider1,LabA",
-        "subject5,ProtA,User1,Brown 6,GP5.5,Provider1,LabA",
+        "subject5,ProtA,User1,Drd1a-Cre,B6.CBA,Provider1,LabA",
+        "subject6,ProtA,User1,C57BL/6J,SHANK3,Provider1,LabA",
     ]
     subject_part_csv_path = pathlib.Path("./tests/user_data/subject/subjects_part.csv")
     write_csv(subject_part_content, subject_part_csv_path)
@@ -314,8 +319,9 @@ def allele_csv():
     """Create a 'allele.csv' for pytests"""
     allele_content = [
         "allele,allele_standard_name,sequence,source,source_identifier,source_url",
-        "Cdh23ahl,cadherin 23 (otocadherin); age related hearing loss 1,G-GT,Provider1,MGI:3028349,jax.org/strain/000664",
-        "Apobec3Rfv3-r,apolipoprotein B mRNA editing enzyme - catalytic polypeptide 3; recovery from Friend virus 3,A-GT,Provider1,MGI:3028349,jax.org/strain/000665",
+        "C57BL/6J,,,Provider1,000664,jax.org/strain/000664",
+        "Drd1a-Cre,Drd1a-Cre,DRd1a-Cre,Provider1,MGI:J:116774,jax.org/strain/024860",
+        "Gad-Cre,Gad-Cre,Cre,Provider1,,",
     ]
     allele_csv_path = pathlib.Path("./tests/user_data/subject/allele.csv")
     write_csv(allele_content, allele_csv_path)
@@ -345,16 +351,16 @@ def breedingpair_csv():
     breedingpair_content = [
         "subject,line,breeding_pair,bp_start_date,bp_end_date,father,mother,"
         + "litter_birth_date,num_of_pups,weaning_date,num_of_male,num_of_female",
-        "subject5,Black 6,1/2,2019-10-15,2020-10-30,subject1,subject2,2020-10-20,2,"
-        + "2020-10-30,1,1",
-        "subject6,Black 6,1/2,2019-10-15,2020-10-30,subject1,subject2,2020-10-20,2,"
-        + "2020-10-30,1,1",
-        "subjectX,Brown 6,5/6,2019-12-31,2020-01-02,subject5,subject6,2020-01-01,3,"
-        + "2020-01-02,2,1",
-        "subjectY,Brown 6,5/6,2019-12-31,2020-01-02,subject5,subject6,2020-01-01,3,"
-        + "2020-01-02,2,1",
-        "subjectZ,Brown 6,5/6,2019-12-31,2020-01-02,subject5,subject6,2020-01-01,3,"
-        + "2020-01-02,2,1",
+        "subject5,C57BL/6J,C57_BP_001,2019-10-15,2020-10-30,subject5,subject6,"
+        + "2020-10-20,2,2020-10-30,1,1",
+        "subject6,C57BL/6J,C57_BP_001,2019-10-15,2020-10-30,subject5,subject6,"
+        + "2020-10-20,2,2020-10-30,1,1",
+        "subjectX,Drd1a-Cre,Drd_BP_001,2019-12-31,2020-01-02,subjectX,subjectY,"
+        + "2020-01-01,3,2020-01-02,2,1",
+        "subjectY,Drd1a-Cre,Drd_BP_001,2019-12-31,2020-01-02,subjectX,subjectY,"
+        + "2020-01-01,3,2020-01-02,2,1",
+        "subjectZ,Drd1a-Cre,Drd_BP_001,2019-12-31,2020-01-02,subjectX,subjectY,"
+        + "2020-01-01,3,2020-01-02,2,1",
     ]
     breedingpair_csv_path = pathlib.Path("./tests/user_data/subject/breedingpair.csv")
     write_csv(breedingpair_content, breedingpair_csv_path)
@@ -368,10 +374,10 @@ def genotype_test_csv():
     """Create a 'genotype_test.csv' for pytests"""
     genotype_test_content = [
         "subject,sequence,genotype_test_id,test_result",
-        "subject5,G-GT,TestA,Present",
-        "subject6,G-GT,TestA,Absent",
-        "subject5,A-GT,TestA,Absent",
-        "subject6,A-GT,TestA,Present",
+        "subject5,DRd1a-Cre,TestA,Present",
+        "subject6,DRd1a-Cre,TestA,Absent",
+        "subject5,Cre,TestB,Absent",
+        "subject6,Cre,TestB,Present",
     ]
     genotype_test_csv_path = pathlib.Path("./tests/user_data/subject/genotype_test.csv")
     write_csv(genotype_test_content, genotype_test_csv_path)
@@ -384,10 +390,10 @@ def genotype_test_csv():
 def line_csv():
     """Create a 'line.csv' for pytests"""
     line_content = [
-        "line,species,is_active,allele",
-        "Black 6,mus musculus,1,Cdh23ahl",
-        "Black 6,mus musculus,1,Apobec3Rfv3-r",
-        "Brown 6,mus musculus,1,Cdh23ahl",
+        "line,species,line_description,target_phenotype,is_active,allele",
+        "C57BL/6J,mus musculus,,,1,C57BL/6J",
+        "Drd1a-Cre,mus musculus,See MMRRC ID 30989,B6.FVB(Cg)-Tg(Drd1-cre)EY262Gsat/Mmucd,1,Drd1a-Cre",
+        "Gad-IRES-Cre,mus musculus,When bred w/loxP-flanked sequences Cre-mediated recombination results in deletion of floxed seq in the GAD2 positive neurons,Gad2-Cr,1,Gad-Cre",
     ]
     line_csv_path = pathlib.Path("./tests/user_data/subject/line.csv")
     write_csv(line_content, line_csv_path)
@@ -401,8 +407,8 @@ def strain_csv():
     """Create a 'strain.csv' for pytests"""
     strain_content = [
         "strain,strain_standard_name,strain_desc",
-        "B6,C57BL/6J,First to have its genome sequenced",
-        "GP5.5,Gcamp6-Thy,Expresses green fluorescent calcium indicator: GCaMP6f",
+        "B6.CBA,B6.CBA-Dh,congenic spontaneous mutation",
+        "SHANK3,Shank3delta ex21,lacking exon 21 of the SH3/ankyrin domain gene 3 gene",
     ]
     strain_csv_path = pathlib.Path("./tests/user_data/subject/strain.csv")
     write_csv(strain_content, strain_csv_path)
@@ -416,12 +422,12 @@ def zygosity_csv():
     """Create a 'zygosity.csv' for pytests"""
     zygosity_content = [
         "subject,allele,zygosity",
-        "subject5,Cdh23ahl,Present",
-        "subject5,Apobec3Rfv3-r,Heterozygous",
-        "subject6,Cdh23ahl,Homozygous",
-        "subjectX,Cdh23ahl,Present",
-        "subjectY,Apobec3Rfv3-r,Present",
-        "subjectZ,Apobec3Rfv3-r,Absent",
+        "subject5,Drd1a-Cre,Heterozygous",
+        "subject5,Gad-Cre,Present",
+        "subject6,Gad-Cre,Homozygous",
+        "subjectX,Gad-Cre,Absent",
+        "subjectY,Drd1a-Cre,Present",
+        "subjectZ,Drd1a-Cre,Present",
     ]
     zygosity_csv_path = pathlib.Path("./tests/user_data/subject/zygosity.csv")
     write_csv(zygosity_content, zygosity_csv_path)
@@ -472,7 +478,7 @@ def ingest_subjects(
     return
 
 
-# Session data and ingestion
+# Session fixtures
 @pytest.fixture
 def sessions_csv():
     """Create a 'sessions.csv' file"""

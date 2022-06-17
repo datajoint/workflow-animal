@@ -1,4 +1,4 @@
-line,species,is_active,allele
-Black 6,mus musculus,1,Cdh23ahl
-Black 6,mus musculus,1,Apobec3Rfv3-r
-Brown 6,mus musculus,1,Cdh23ahl
+line,species,line_description,target_phenotype,is_active,allele
+C57BL/6J,mus musculus,,,1,C57BL/6J
+Drd1a-Cre,mus musculus,See MMRRC ID 30989,B6.FVB(Cg)-Tg(Drd1-cre)EY262Gsat/Mmucd,1,Drd1a-Cre
+Gad-IRES-Cre,mus musculus,When bred w/loxP-flanked sequences Cre-mediated recombination results in deletion of floxed seq in the GAD2 positive neurons,Gad2-Cr,1,Gad-Cre

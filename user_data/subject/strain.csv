@@ -1,3 +1,3 @@
 strain,strain_standard_name,strain_desc
-B6,C57BL/6J,First to have its genome sequenced
-GP5.5,Gcamp6-Thy,Expresses green fluorescent calcium indicator: GCaMP6f
+B6.CBA,B6.CBA-Dh,congenic spontaneous mutation
+SHANK3,Shank3delta ex21,lacking exon 21 of the SH3/ankyrin domain gene 3 gene

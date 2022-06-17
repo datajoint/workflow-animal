@@ -1,5 +1,5 @@
 subject,sequence,genotype_test_id,test_result
-subject5,G-GT,TestA,Present
-subject6,G-GT,TestA,Absent
-subject5,A-GT,TestB,Absent
-subject6,A-GT,TestB,Present
+subject5,DRd1a-Cre,TestA,Present
+subject6,DRd1a-Cre,TestA,Absent
+subject5,Cre,TestB,Absent
+subject6,Cre,TestB,Present

@@ -1,3 +1,4 @@
 allele,allele_standard_name,sequence,source,source_identifier,source_url
-Apobec3Rfv3-r,apolipoprotein B mRNA editing enzyme - catalytic polypeptide 3; recovery from Friend virus 3,A-GT,Provider1,MGI:3028349,jax.org/strain/000665
-Cdh23ahl,cadherin 23 (otocadherin); age related hearing loss 1,G-GT,Provider1,MGI:3028349,jax.org/strain/000664
+C57BL/6J,,,Provider1,000664,jax.org/strain/000664
+Drd1a-Cre,Drd1a-Cre,DRd1a-Cre,Provider1,MGI:J:116774,jax.org/strain/024860
+Gad-Cre,Gad-Cre,Cre,Provider1,,
