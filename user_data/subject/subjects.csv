@@ -1,6 +1,6 @@
 subject,sex,subject_birth_date,subject_description,death_date,cull_method
 subject5,F,2020-01-01 00:00:01,rich,2020-10-02 00:00:01,natural causes
 subject6,M,2020-01-01 00:00:01,manuel,2020-10-03 00:00:01,natural causes
-subjectX,F,2020-01-01 00:00:01,manuel,2020-10-03 00:00:01,natural causes
-subjectY,M,2020-01-01 00:00:01,manuel,2020-10-03 00:00:01,natural causes
-subjectZ,M,2020-01-01 00:00:01,manuel,2020-10-03 00:00:01,natural causes
+subjectX,F,2020-01-01 00:00:01,ally,2020-10-04 00:00:01,natural causes
+subjectY,M,2020-01-01 00:00:01,thom,2020-10-05 00:00:01,natural causes
+subjectZ,M,2020-01-01 00:00:01,winston,2020-10-06 00:00:01,natural causes

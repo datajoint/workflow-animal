@@ -1,6 +1,6 @@
 datajoint>=0.13.0
-element-lab==0.1.0b1
-element-animal==0.1.0b0
-element-session==0.1.0b0
+element-lab>=0.1.0b1
+element-animal>=0.1.0b0
+element-session>=0.1.0b0
 ipykernel
-pynwb==2.0.0
+pynwb>=2.0.0

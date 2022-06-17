@@ -1,2 +1,4 @@
-line, line_description, target_phenotype, is_active
-C57BL/6J
+line,species,is_active,allele
+Black 6,mus musculus,1,Cdh23ahl
+Black 6,mus musculus,1,Apobec3Rfv3-r
+Brown 6,mus musculus,1,Cdh23ahl

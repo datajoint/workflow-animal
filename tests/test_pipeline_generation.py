@@ -11,6 +11,7 @@ from . import pipeline
 
 def test_generate_pipeline(pipeline):
     session = pipeline["session"]
+    genotyping = pipeline["genotyping"]
     subject = pipeline["subject"]
     lab = pipeline["lab"]
 
@@ -21,34 +22,34 @@ def test_generate_pipeline(pipeline):
     assert subject_lab_tbl.full_table_name == subject.Subject.Lab.full_table_name
 
     # test connection Subject -> schema children
-    (
-        _,
-        _,
-        _,
-        _,
-        _,
-        session_tbl,
-        _,
-        subject_line_tbl,
-        subject_protocol_tbl,
-        subject_source_tbl,
-        subject_strain_tbl,
-        subject_user_tbl,
-        subject_cull_tbl,
-        subject_death_tbl,
-        subject_zygotsity_tbl,
-    ) = subject.Subject.children(as_objects=True)
-    assert session_tbl.full_table_name == session.Session.full_table_name
-    assert subject_line_tbl.full_table_name == subject.Subject.Line.full_table_name
-    assert (
-        subject_protocol_tbl.full_table_name == subject.Subject.Protocol.full_table_name
-    )
-    assert subject_source_tbl.full_table_name == subject.Subject.Source.full_table_name
-    assert subject_strain_tbl.full_table_name == subject.Subject.Strain.full_table_name
-    assert subject_user_tbl.full_table_name == subject.Subject.User.full_table_name
-    assert subject_cull_tbl.full_table_name == subject.SubjectCullMethod.full_table_name
-    assert subject_death_tbl.full_table_name == subject.SubjectDeath.full_table_name
-    assert subject_zygotsity_tbl.full_table_name == subject.Zygosity.full_table_name
+    subj_children_link = subject.Subject.children(as_objects=True)
+    subj_children_list = [
+        genotyping.BreedingPair.Father,
+        genotyping.BreedingPair.Mother,
+        genotyping.GenotypeTest,
+        genotyping.SubjectCaging,
+        genotyping.SubjectLitter,
+        session.Session,
+        subject.Subject.Lab,
+        subject.Subject.Line,
+        subject.Subject.Protocol,
+        subject.Subject.Source,
+        subject.Subject.Strain,
+        subject.Subject.User,
+        subject.SubjectCullMethod,
+        subject.SubjectDeath,
+        subject.Zygosity,
+    ]
+
+    for child_link, child_list in zip(subj_children_link, subj_children_list):
+        assert (
+            child_link.full_table_name == child_list.full_table_name
+        ), f"subject.Subject.children(): Expected {child_list}, Found {child_link}"
+
+    # test genotyping.Sequence -> other genotyping tables
+    geno_allele_tbl, geno_test_tbl = genotyping.Sequence.children(as_objects=True)
+    assert geno_allele_tbl.full_table_name == genotyping.AlleleSequence.full_table_name
+    assert geno_test_tbl.full_table_name == genotyping.GenotypeTest.full_table_name
 
     # test connection Subject->Session
     subject_tbl, *_ = session.Session.parents(as_objects=True)

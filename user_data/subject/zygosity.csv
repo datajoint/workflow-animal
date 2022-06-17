@@ -1,0 +1,7 @@
+subject,allele,zygosity
+subject5,Apobec3Rfv3-r,Heterozygous
+subject5,Cdh23ahl,Present
+subject6,Cdh23ahl,Homozygous
+subjectX,Cdh23ahl,Present
+subjectY,Apobec3Rfv3-r,Present
+subjectZ,Apobec3Rfv3-r,Absent
