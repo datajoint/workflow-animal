@@ -16,13 +16,13 @@ def test_generate_pipeline(pipeline):
     lab = pipeline["lab"]
 
     # test connection Lab->schema children, and Lab->Subject.Lab
-    loc_tbl, lab_membership, subject_lab_tbl = lab.Lab.children(as_objects=True)
-    assert lab_membership.full_table_name == lab.LabMembership.full_table_name
-    assert loc_tbl.full_table_name == lab.Location.full_table_name
-    assert subject_lab_tbl.full_table_name == subject.Subject.Lab.full_table_name
+    lab_children = lab.Lab.children()
+    assert lab.LabMembership.full_table_name in lab_children
+    assert lab.Location.full_table_name in lab_children
+    assert subject.Subject.Lab.full_table_name in lab_children
 
     # test connection Subject -> schema children
-    subj_children_link = subject.Subject.children(as_objects=True)
+    subj_children_links = subject.Subject.children()
     subj_children_list = [
         subject.Subject.Protocol,
         subject.Subject.User,
@@ -41,16 +41,16 @@ def test_generate_pipeline(pipeline):
         genotyping.GenotypeTest,
     ]
 
-    for child_link, child_list in zip(subj_children_link, subj_children_list):
+    for child in subj_children_list:
         assert (
-            child_link.full_table_name == child_list.full_table_name
-        ), f"subject.Subject.children(): Expected {child_list}, Found {child_link}"
+            child.full_table_name in subj_children_links
+        ), f"subject.Subject.children() did not include {child.full_table_name}"
 
     # test genotyping.Sequence -> other genotyping tables
-    geno_allele_tbl, geno_test_tbl = genotyping.Sequence.children(as_objects=True)
-    assert geno_allele_tbl.full_table_name == genotyping.AlleleSequence.full_table_name
-    assert geno_test_tbl.full_table_name == genotyping.GenotypeTest.full_table_name
+    genotyping_children = genotyping.Sequence.children()
+    assert genotyping.AlleleSequence.full_table_name in genotyping_children
+    assert genotyping.GenotypeTest.full_table_name in genotyping_children
 
     # test connection Subject->Session
-    subject_tbl, *_ = session.Session.parents(as_objects=True)
-    assert subject_tbl.full_table_name == subject.Subject.full_table_name
+    session_parents = session.Session.parents()
+    assert subject.Subject.full_table_name in session_parents
