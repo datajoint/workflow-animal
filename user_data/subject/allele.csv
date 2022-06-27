@@ -1,2 +1,4 @@
-allele, allele_standard_name,zygosity
-Ex,Example,Absent
+allele,allele_standard_name,sequence,source,source_identifier,source_url
+C57BL/6J,,,Provider1,000664,jax.org/strain/000664
+Drd1a-Cre,Drd1a-Cre,DRd1a-Cre,Provider1,MGI:J:116774,jax.org/strain/024860
+Gad-Cre,Gad-Cre,Cre,Provider1,,

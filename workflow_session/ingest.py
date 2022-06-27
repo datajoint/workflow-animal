@@ -1,34 +1,6 @@
 import csv
-from workflow_session.pipeline import lab, subject, session
-
-
-def ingest_general(csvs, tables, skip_duplicates=True, verbose=True):
-    """
-    Inserts data from a series of csvs into their corresponding table:
-        e.g., ingest_general(['./lab_data.csv', './proj_data.csv'],
-                                 [lab.Lab(),lab.Project()]
-    ingest_general(csvs, tables, skip_duplicates=True)
-        :param csvs: list of relative paths to CSV files.  CSV are delimited by commas.
-        :param tables: list of datajoint tables with ()
-        :param verbose: print number inserted (i.e., table length change)
-    """
-    for csv_filepath, table in zip(csvs, tables):
-        with open(csv_filepath, newline="") as f:
-            data = list(csv.DictReader(f, delimiter=","))
-        if verbose:
-            prev_len = len(table)
-        table.insert(
-            data,
-            skip_duplicates=skip_duplicates,
-            # Ignore extra fields because some CSVs feed multiple tables
-            ignore_extra_fields=True,
-        )
-        if verbose:
-            insert_len = len(table) - prev_len  # report length change
-            print(
-                f"\n---- Inserting {insert_len} entry(s) "
-                + f"into {table.table_name} ----"
-            )
+from element_interface.utils import ingest_csv_to_table
+from workflow_session.pipeline import lab, subject, session, genotyping
 
 
 def ingest_lab(
@@ -39,88 +11,146 @@ def ingest_lab(
     protocol_csv_path="./user_data/lab/protocols.csv",
     users_csv_path="./user_data/lab/users.csv",
     project_user_csv_path="./user_data/lab/project_users.csv",
+    sources_csv_path="./user_data/lab/sources.csv",
     skip_duplicates=True,
     verbose=True,
 ):
     """
     Inserts data from a CSVs into their corresponding lab schema tables.
     By default, uses data from workflow_session/user_data/lab/
-    :param lab_csv_path:      relative path of lab csv
-    :param project_csv_path:  relative path of project csv
-    :param publication_csv_path:     relative path of publication csv
-    :param keyword_csv_path:     relative path of keyword csv
-    :param protocol_csv_path: relative path of protocol csv
-    :param users_csv_path:    relative path of users csv
-    :param project_user_csv_path: relative path of project users csv
+    :param lab_csv_path:            relative path of lab csv
+    :param project_csv_path:        relative path of project csv
+    :param publication_csv_path:    relative path of publication csv
+    :param keyword_csv_path:        relative path of keyword csv
+    :param protocol_csv_path:       relative path of protocol csv
+    :param users_csv_path:          relative path of users csv
+    :param project_user_csv_path:   relative path of project users csv
+    :param sources_csv_path:        relative path of sources csv
     :param skip_duplicates=True: datajoint insert function param
     :param verbose: print number inserted (i.e., table length change)
     """
 
     # List with repeats for when mult dj.tables fed by same CSV
     csvs = [
-        lab_csv_path,
-        lab_csv_path,
-        project_csv_path,
-        project_csv_path,
-        publication_csv_path,
-        keyword_csv_path,
-        protocol_csv_path,
-        protocol_csv_path,
-        users_csv_path,
-        users_csv_path,
-        users_csv_path,
-        project_user_csv_path,
+        lab_csv_path,  # 0
+        lab_csv_path,  # 1
+        project_csv_path,  # 2
+        project_csv_path,  # 3
+        publication_csv_path,  # 4
+        keyword_csv_path,  # 5
+        protocol_csv_path,  # 6
+        protocol_csv_path,  # 7
+        users_csv_path,  # 8
+        users_csv_path,  # 9
+        users_csv_path,  # 10
+        project_user_csv_path,  # 11
+        sources_csv_path,  # 12
     ]
     tables = [
-        lab.Lab(),
-        lab.Location(),
-        lab.Project(),
-        lab.ProjectSourceCode(),
-        lab.ProjectPublication(),
-        lab.ProjectKeywords(),
-        lab.ProtocolType(),
-        lab.Protocol(),
-        lab.UserRole(),
-        lab.User(),
-        lab.LabMembership(),
-        lab.ProjectUser(),
+        lab.Lab(),  # 0
+        lab.Location(),  # 1
+        lab.Project(),  # 2
+        lab.ProjectSourceCode(),  # 3
+        lab.ProjectPublication(),  # 4
+        lab.ProjectKeywords(),  # 5
+        lab.ProtocolType(),  # 6
+        lab.Protocol(),  # 7
+        lab.UserRole(),  # 8
+        lab.User(),  # 9
+        lab.LabMembership(),  # 10
+        lab.ProjectUser(),  # 11
+        lab.Source(),  # 13
     ]
 
-    ingest_general(csvs, tables, skip_duplicates=skip_duplicates, verbose=verbose)
+    ingest_csv_to_table(csvs, tables, skip_duplicates=skip_duplicates, verbose=verbose)
 
 
 def ingest_subjects(
     subject_csv_path="./user_data/subject/subjects.csv",
     subject_part_csv_path="./user_data/subject/subjects_part.csv",
+    allele_csv_path="./user_data/subject/allele.csv",
+    cage_csv_path="./user_data/subject/cage.csv",
+    breedingpair_csv_path="./user_data/subject/breedingpair.csv",
+    genotype_test_csv_path="./user_data/subject/genotype_test.csv",
+    line_csv_path="./user_data/subject/line.csv",
+    strain_csv_path="./user_data/subject/strain.csv",
+    zygosity_csv_path="./user_data/subject/zygosity.csv",
     skip_duplicates=True,
     verbose=True,
 ):
     """
     Inserts data from a subject csv into corresponding subject schema tables
     By default, uses data from workflow_session/user_data/subject/
-    :param subject_csv_path:      relative path of csv for subject data
-    :param subject_part_csv_path: relative path of csv for subject part tables
+    :param subject_csv_path:        relative path of csv for subject data
+    :param subject_part_csv_path:   relative path of csv for subject part tables
+    :param allele_csv_path:         relative path of csv for alleles
+    :param cage_csv_path:           relative path of csv for cages
+    :param breedingpair_csv_path:   relative path of csv for breeding pairs
+    :param genotype_test_csv_path:  relative path of csv for genotype
+    :param line_csv_path:           relative path of csv for line
+    :param strain_csv_path:         relative path of csv for strain
+    :param zygosity_csv_path:       relative path of csv for zygotsky
     :param skip_duplicates=True: datajoint insert function param
     :param verbose: print number inserted (i.e., table length change)
     """
     csvs = [
-        subject_csv_path,
-        subject_csv_path,
-        subject_csv_path,
-        subject_part_csv_path,
-        subject_part_csv_path,
-        subject_part_csv_path,
+        subject_csv_path,  # 0
+        subject_csv_path,  # 1
+        subject_csv_path,  # 2
+        subject_part_csv_path,  # 3
+        subject_part_csv_path,  # 4
+        subject_part_csv_path,  # 5
+        strain_csv_path,  # 6
+        allele_csv_path,  # 7
+        allele_csv_path,  # 8
+        allele_csv_path,  # 9
+        allele_csv_path,  # 10
+        line_csv_path,  # 11
+        line_csv_path,  # 12
+        subject_part_csv_path,  # 13
+        subject_part_csv_path,  # 14
+        subject_part_csv_path,  # 15
+        zygosity_csv_path,  # 16
+        breedingpair_csv_path,  # 17
+        breedingpair_csv_path,  # 18
+        breedingpair_csv_path,  # 19
+        breedingpair_csv_path,  # 20
+        breedingpair_csv_path,  # 21
+        breedingpair_csv_path,  # 22
+        cage_csv_path,  # 23
+        cage_csv_path,  # 24
+        genotype_test_csv_path,  # 25
     ]
     tables = [
-        subject.Subject(),
-        subject.SubjectDeath(),
-        subject.SubjectCullMethod(),
-        subject.Subject.Protocol(),
-        subject.Subject.User(),
-        subject.Subject.Lab(),
+        subject.Subject(),  # 0
+        subject.SubjectDeath(),  # 1
+        subject.SubjectCullMethod(),  # 2
+        subject.Subject.Protocol(),  # 3
+        subject.Subject.User(),  # 4
+        subject.Subject.Lab(),  # 5
+        subject.Strain(),  # 6
+        subject.Allele(),  # 7
+        subject.Allele.Source(),  # 8
+        genotyping.Sequence(),  # 9
+        genotyping.AlleleSequence(),  # 10
+        subject.Line(),  # 11
+        subject.Line.Allele(),  # 12
+        subject.Subject.Line(),  # 13
+        subject.Subject.Strain(),  # 14
+        subject.Subject.Source(),  # 15
+        subject.Zygosity(),  # 16
+        genotyping.BreedingPair(),  # 17
+        genotyping.BreedingPair.Father(),  # 18
+        genotyping.BreedingPair.Mother(),  # 19
+        genotyping.Litter(),  # 20
+        genotyping.Weaning(),  # 21
+        genotyping.SubjectLitter(),  # 22
+        genotyping.Cage(),  # 23
+        genotyping.SubjectCaging(),  # 24
+        genotyping.GenotypeTest(),  # 25
     ]
 
-    ingest_general(csvs, tables, skip_duplicates=skip_duplicates, verbose=verbose)
+    ingest_csv_to_table(csvs, tables, skip_duplicates=skip_duplicates, verbose=verbose)
 
 
 def ingest_sessions(
@@ -150,7 +180,7 @@ def ingest_sessions(
         session.SessionExperimenter(),
     ]
 
-    ingest_general(csvs, tables, skip_duplicates=skip_duplicates, verbose=verbose)
+    ingest_csv_to_table(csvs, tables, skip_duplicates=skip_duplicates, verbose=verbose)
 
 
 if __name__ == "__main__":

@@ -12,10 +12,18 @@ __all__ = [
     "lab_publications_csv",
     "lab_keywords_csv",
     "lab_protocol_csv",
+    "lab_sources_csv",
     "lab_project_users_csv",
     "ingest_lab",
     "subjects_csv",
     "subjects_part_csv",
+    "allele_csv",
+    "cage_csv",
+    "breedingpair_csv",
+    "genotype_test_csv",
+    "line_csv",
+    "strain_csv",
+    "zygosity_csv",
     "ingest_subjects",
     "sessions_csv",
     "ingest_sessions",
@@ -31,16 +39,26 @@ from . import (
     lab_keywords_csv,
     lab_protocol_csv,
     lab_project_users_csv,
+    lab_source_csv,
     ingest_lab,
     subjects_csv,
     subjects_part_csv,
+    allele_csv,
+    cage_csv,
+    breedingpair_csv,
+    genotype_test_csv,
+    line_csv,
+    strain_csv,
+    zygosity_csv,
     ingest_subjects,
     sessions_csv,
     ingest_sessions,
 )
 
 
-def test_ingest_lab(pipeline, ingest_lab, lab_csv, lab_project_csv, lab_protocol_csv):
+def test_ingest_lab(
+    pipeline, ingest_lab, lab_csv, lab_project_csv, lab_protocol_csv, lab_source_csv
+):
     """Check length of various lab schema tables"""
     lab = pipeline["lab"]
     assert len(lab.Lab()) == 2, f"Check Lab: len={len(lab.Lab())}"
@@ -79,40 +97,92 @@ def test_ingest_lab(pipeline, ingest_lab, lab_csv, lab_project_csv, lab_protocol
         ) == protocol_values[1]
 
 
-def test_ingest_subjects(pipeline, subjects_csv, subjects_part_csv, ingest_subjects):
-    """Check length of subject.Subject"""
+def test_ingest_subjects(
+    pipeline,
+    ingest_subjects,
+    subjects_csv,
+    subjects_part_csv,
+    allele_csv,
+    cage_csv,
+    breedingpair_csv,
+    genotype_test_csv,
+    line_csv,
+    strain_csv,
+    zygosity_csv,
+):
+    """Check lengths of tables, then test 1 value per input csv"""
     subject = pipeline["subject"]
-    assert len(subject.Subject()) == 3, f"Check Subject: len={len(subject.Subject())}"
-    assert (
-        len(subject.Subject.Protocol()) == 2
-    ), f"Check Subject.Protocol: len={len(subject.Subject.Protocol())}"
-    assert (
-        len(subject.Subject.User()) == 2
-    ), f"Check Subject.User: len={len(subject.Subject.User())}"
+    genotyping = pipeline["genotyping"]
 
-    subjects, _ = subjects_csv
-    subjects_parts, _ = subjects_part_csv
-    for this_subject in subjects[1:]:
-        subject_values = this_subject.split(",")
-        assert (subject.Subject & {"subject": subject_values[0]}).fetch1(
-            "subject_description"
-        ) == subject_values[3]
-    for this_subject in subjects_parts[1:]:
-        subject_values = this_subject.split(",")
-        assert (subject.Subject.Protocol & {"subject": subject_values[0]}).fetch1(
-            "protocol"
-        ) == subject_values[1]
-        assert (subject.Subject.User & {"subject": subject_values[0]}).fetch1(
-            "user"
-        ) == subject_values[2]
+    tables = [
+        subject.Subject(),  # 0
+        subject.Subject.Protocol(),  # 3
+        subject.Strain(),  # 6
+        subject.Allele(),  # 7
+        subject.Line(),  # 11
+        subject.Zygosity(),  # 16
+        genotyping.BreedingPair(),  # 17
+        genotyping.Cage(),  # 23
+        genotyping.GenotypeTest(),  # 25
+    ]
+
+    lengths = [
+        5,  # 0
+        2,  # 3
+        2,  # 6
+        3,  # 7
+        3,  # 11
+        6,  # 16
+        2,  # 17
+        2,  # 23
+        4,  # 25
+    ]
+
+    csvs = [
+        subjects_csv,  # 0
+        subjects_part_csv,  # 3
+        strain_csv,  # 6
+        allele_csv,  # 7
+        line_csv,  # 11
+        zygosity_csv,  # 16
+        breedingpair_csv,  # 17
+        cage_csv,  # 23
+        genotype_test_csv,  # 25
+    ]
+
+    tested_cols = {  # column name, index in csv
+        "subject_description": 3,
+        "protocol": 1,
+        "strain_standard_name": 1,
+        "allele": 0,
+        "line": 0,
+        "zygosity": 2,
+        "breeding_pair": 2,
+        "cage": 0,
+        "genotype_test_id": 2,
+    }
+
+    for table, length, csv, (col, idx) in zip(
+        tables, lengths, csvs, tested_cols.items()
+    ):
+        assert len(table) == length, f"Check length of {table.full_table_name}"
+        content_raw, _ = csv  # split csv content by comma, keep only indexed item
+        csv_values = set([val.split(",")[idx] for val in content_raw[1:]])
+        db_values = set(list(table.fetch(col)))  # set for unique vals, csvs have dupes
+        assert all(  # Lists weren't equal on testing, so iteraterating
+            [c == d for c, d in zip(csv_values, db_values)]
+        ), (
+            f"CSV doesn't match fetched values for {table.full_table_name}:\n"
+            + f"CSV:{csv_values}\n DB:{db_values}"
+        )
 
 
 def test_ingest_sessions(pipeline, sessions_csv, ingest_sessions):
     """Check length/contents of Session.SessionDirectory"""
     session = pipeline["session"]
-    assert len(session.Session()) == 3, f"Check Session: len={len(session.Session())}"
+    assert len(session.Session()) == 2, f"Check Session: len={len(session.Session())}"
     assert (
-        len(session.ProjectSession()) == 3
+        len(session.ProjectSession()) == 2
     ), f"Check ProjectSession: len={len(session.ProjectSession())}"
 
     sessions, _ = sessions_csv

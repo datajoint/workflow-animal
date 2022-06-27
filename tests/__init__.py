@@ -11,6 +11,8 @@ import pytest
 import pathlib
 import datajoint as dj
 
+__all__ = ["pipeline"]
+
 # ------------------- SOME CONSTANTS -------------------
 
 _tear_down = True
@@ -76,27 +78,33 @@ def pipeline():
 
     yield {
         "subject": pipeline.subject,
+        "genotyping": pipeline.genotyping,
         "session": pipeline.session,
         "lab": pipeline.lab,
     }
 
     if _tear_down:
         if verbose:
+            pipeline.genotyping.BreedingPair.delete()
             pipeline.subject.Subject.delete()
+            pipeline.subject.Line.delete()
             pipeline.session.Session.delete()
             pipeline.lab.Lab.delete()
         else:
             with QuietStdOut():
+                pipeline.genotyping.BreedingPair.delete()
                 pipeline.subject.Subject.delete()
+                pipeline.subject.Line.delete()
                 pipeline.session.Session.delete()
                 pipeline.lab.Lab.delete()
 
 
+# Lab fixtures
 @pytest.fixture
 def lab_csv():
     """Create a 'labs.csv' file"""
     lab_content = [
-        "lab,lab_name,institution,address," + "time_zone,location,location_description",
+        "lab,lab_name,institution,address,time_zone,location,location_description",
         "LabA,The Example Lab,Example Uni,"
         + "'221B Baker St,London NW1 6XE,UK',UTC+0,"
         + "Example Building,'2nd floor lab dedicated to all "
@@ -117,7 +125,7 @@ def lab_csv():
 def lab_project_csv():
     """Create a 'projects.csv' file"""
     lab_project_content = [
-        "project,project_description,repository_url," + "repository_name,codeurl",
+        "project,project_description,repository_url,repository_name,codeurl",
         "ProjA,Example project to populate element-lab,"
         + "https://github.com/datajoint/element-lab/,"
         + "element-lab,https://github.com/datajoint/element"
@@ -145,10 +153,7 @@ def lab_project_users_csv():
         "Dr. Candace Pert,ProjA",
         "User1,ProjA",
     ]
-    lab_project_user_csv_path = pathlib.Path(
-        "./tests/user_data/lab/\
-                                              project_users.csv"
-    )
+    lab_project_user_csv_path = pathlib.Path("./tests/user_data/lab/project_users.csv")
     write_csv(lab_project_user_content, lab_project_user_csv_path)
 
     yield lab_project_user_content, lab_project_user_csv_path
@@ -194,8 +199,8 @@ def lab_protocol_csv():
     """Create a 'protocols.csv' file"""
     lab_protocol_content = [
         "protocol,protocol_type,protocol_description",
-        "ProtA,IRB expedited review,Protocol for managing " + "data ingestion",
-        "ProtB,Alternative Method,Limited protocol for " + "piloting only",
+        "ProtA,IRB expedited review,Protocol for managing data ingestion",
+        "ProtB,Alternative Method,Limited protocol for piloting only",
     ]
     lab_protocol_csv_path = pathlib.Path("./tests/user_data/lab/protocols.csv")
     write_csv(lab_protocol_content, lab_protocol_csv_path)
@@ -209,9 +214,9 @@ def lab_user_csv():
     """Create a 'users.csv' file"""
     lab_user_content = [
         "lab,user,user_role,user_email,user_cellphone",
-        "LabA,Sherlock,PI,Sherlock@BakerSt.com," + "+44 20 7946 0344",
+        "LabA,Sherlock,PI,Sherlock@BakerSt.com,+44 20 7946 0344",
         "LabA,Watson,Dr,DrWatson@BakerSt.com,+44 73 8389 1763",
-        "LabB,Dr. Candace Pert,PI,Pert@gmail.com," + "+44 74 4046 5899",
+        "LabB,Dr. Candace Pert,PI,Pert@gmail.com,+44 74 4046 5899",
         "LabA,User1,Lab Tech,fake@email.com,+44 1632 960103",
         "LabB,User2,Lab Tech,fake2@email.com,+44 1632 960102",
     ]
@@ -220,6 +225,21 @@ def lab_user_csv():
 
     yield lab_user_content, lab_user_csv_path
     lab_user_csv_path.unlink()
+
+
+@pytest.fixture
+def lab_source_csv():
+    """Create a 'sources.csv' file"""
+    sources_content = [
+        "source,source_name,contact_details,source_description",
+        "Provider1,Example Provider,+44 1632 960663 / Example@Provider.com,UK-based "
+        + "supplier of lab subjects mus musculus",
+    ]
+    sources_csv_path = pathlib.Path("./tests/user_data/lab/sources.csv")
+    write_csv(sources_content, sources_csv_path)
+
+    yield sources_content, sources_csv_path
+    sources_csv_path.unlink()
 
 
 @pytest.fixture
@@ -232,6 +252,7 @@ def ingest_lab(
     lab_protocol_csv,
     lab_user_csv,
     lab_project_users_csv,
+    lab_source_csv,
 ):
     """From workflow_session ingest.py, import ingest_lab, run"""
     from workflow_session.ingest import ingest_lab
@@ -243,6 +264,7 @@ def ingest_lab(
     _, lab_protocol_csv_path = lab_protocol_csv
     _, lab_user_csv_path = lab_user_csv
     _, lab_project_user_csv_path = lab_project_users_csv
+    _, lab_source_csv_path = lab_source_csv
     ingest_lab(
         lab_csv_path=lab_csv_path,
         project_csv_path=lab_project_csv_path,
@@ -251,21 +273,24 @@ def ingest_lab(
         protocol_csv_path=lab_protocol_csv_path,
         users_csv_path=lab_user_csv_path,
         project_user_csv_path=lab_project_user_csv_path,
+        sources_csv_path=lab_source_csv_path,
         verbose=verbose,
     )
     return
 
 
-# Subject data and ingestion
+# Subject Fixtures
 @pytest.fixture
 def subjects_csv():
     """Create a 'subjects.csv' file"""
     subject_content = [
         "subject,sex,subject_birth_date,subject_description,"
         + "death_date,cull_method",
-        "subject3,F,2020-01-01 00:00:01,rich," + "2020-10-02 00:00:01,natural causes",
-        "subject5,F,2020-01-01 00:00:01,rich," + "2020-10-02 00:00:01,natural causes",
-        "subject6,M,2020-01-01 00:00:01,manuel," + "2020-10-03 00:00:01,natural causes",
+        "subject5,F,2020-01-01 00:00:01,rich,2020-10-02 00:00:01,natural causes",
+        "subject6,M,2020-01-01 00:00:01,manuel,2020-10-03 00:00:01,natural causes",
+        "subjectX,F,2020-01-01 00:00:01,ally,2020-10-04 00:00:01,natural causes",
+        "subjectY,M,2020-01-01 00:00:01,thom,2020-10-05 00:00:01,natural causes",
+        "subjectZ,M,2020-01-01 00:00:01,winston,2020-10-06 00:00:01,natural causes",
     ]
     subject_csv_path = pathlib.Path("./tests/user_data/subject/subjects.csv")
     write_csv(subject_content, subject_csv_path)
@@ -279,8 +304,8 @@ def subjects_part_csv():
     """Create a 'subjects_part.csv for Subject part tables"""
     subject_part_content = [
         "subject,protocol,user,line,strain,source,lab",
-        "subject6,ProtA,User1,line,strain,source,LabA",
-        "subject5,ProtA,User1,line,strain,source,LabA",
+        "subject5,ProtA,User1,Drd1a-Cre,B6.CBA,Provider1,LabA",
+        "subject6,ProtA,User1,C57BL/6J,SHANK3,Provider1,LabA",
     ]
     subject_part_csv_path = pathlib.Path("./tests/user_data/subject/subjects_part.csv")
     write_csv(subject_part_content, subject_part_csv_path)
@@ -290,30 +315,177 @@ def subjects_part_csv():
 
 
 @pytest.fixture
-def ingest_subjects(pipeline, ingest_lab, subjects_csv, subjects_part_csv):
+def allele_csv():
+    """Create a 'allele.csv' for pytests"""
+    allele_content = [
+        "allele,allele_standard_name,sequence,source,source_identifier,source_url",
+        "C57BL/6J,,,Provider1,000664,jax.org/strain/000664",
+        "Drd1a-Cre,Drd1a-Cre,DRd1a-Cre,Provider1,MGI:J:116774,jax.org/strain/024860",
+        "Gad-Cre,Gad-Cre,Cre,Provider1,,",
+    ]
+    allele_csv_path = pathlib.Path("./tests/user_data/subject/allele.csv")
+    write_csv(allele_content, allele_csv_path)
+
+    yield allele_content, allele_csv_path
+    allele_csv_path.unlink()
+
+
+@pytest.fixture
+def cage_csv():
+    """Create a 'cage.csv' for pytests"""
+    cage_content = [
+        "cage,subject,caging_datetime,user",
+        "1,subject5,2020-01-02,User1",
+        "2,subject6,2020-01-02,User2",
+    ]
+    cage_csv_path = pathlib.Path("./tests/user_data/subject/cage.csv")
+    write_csv(cage_content, cage_csv_path)
+
+    yield cage_content, cage_csv_path
+    cage_csv_path.unlink()
+
+
+@pytest.fixture
+def breedingpair_csv():
+    """Create a 'breedingpair.csv' for pytests"""
+    breedingpair_content = [
+        "subject,line,breeding_pair,bp_start_date,bp_end_date,father,mother,"
+        + "litter_birth_date,num_of_pups,weaning_date,num_of_male,num_of_female",
+        "subject5,C57BL/6J,C57_BP_001,2019-10-15,2020-10-30,subject5,subject6,"
+        + "2020-10-20,2,2020-10-30,1,1",
+        "subject6,C57BL/6J,C57_BP_001,2019-10-15,2020-10-30,subject5,subject6,"
+        + "2020-10-20,2,2020-10-30,1,1",
+        "subjectX,Drd1a-Cre,Drd_BP_001,2019-12-31,2020-01-02,subjectX,subjectY,"
+        + "2020-01-01,3,2020-01-02,2,1",
+        "subjectY,Drd1a-Cre,Drd_BP_001,2019-12-31,2020-01-02,subjectX,subjectY,"
+        + "2020-01-01,3,2020-01-02,2,1",
+        "subjectZ,Drd1a-Cre,Drd_BP_001,2019-12-31,2020-01-02,subjectX,subjectY,"
+        + "2020-01-01,3,2020-01-02,2,1",
+    ]
+    breedingpair_csv_path = pathlib.Path("./tests/user_data/subject/breedingpair.csv")
+    write_csv(breedingpair_content, breedingpair_csv_path)
+
+    yield breedingpair_content, breedingpair_csv_path
+    breedingpair_csv_path.unlink()
+
+
+@pytest.fixture
+def genotype_test_csv():
+    """Create a 'genotype_test.csv' for pytests"""
+    genotype_test_content = [
+        "subject,sequence,genotype_test_id,test_result",
+        "subject5,DRd1a-Cre,TestA,Present",
+        "subject6,DRd1a-Cre,TestA,Absent",
+        "subject5,Cre,TestB,Absent",
+        "subject6,Cre,TestB,Present",
+    ]
+    genotype_test_csv_path = pathlib.Path("./tests/user_data/subject/genotype_test.csv")
+    write_csv(genotype_test_content, genotype_test_csv_path)
+
+    yield genotype_test_content, genotype_test_csv_path
+    genotype_test_csv_path.unlink()
+
+
+@pytest.fixture
+def line_csv():
+    """Create a 'line.csv' for pytests"""
+    line_content = [
+        "line,species,line_description,target_phenotype,is_active,allele",
+        "C57BL/6J,mus musculus,,,1,C57BL/6J",
+        "Drd1a-Cre,mus musculus,See MMRRC ID 30989,B6.FVB(Cg)-Tg(Drd1-cre)EY262Gsat/Mmucd,1,Drd1a-Cre",
+        "Gad-IRES-Cre,mus musculus,When bred w/loxP-flanked sequences Cre-mediated recombination results in deletion of floxed seq in the GAD2 positive neurons,Gad2-Cr,1,Gad-Cre",
+    ]
+    line_csv_path = pathlib.Path("./tests/user_data/subject/line.csv")
+    write_csv(line_content, line_csv_path)
+
+    yield line_content, line_csv_path
+    line_csv_path.unlink()
+
+
+@pytest.fixture
+def strain_csv():
+    """Create a 'strain.csv' for pytests"""
+    strain_content = [
+        "strain,strain_standard_name,strain_desc",
+        "B6.CBA,B6.CBA-Dh,congenic spontaneous mutation",
+        "SHANK3,Shank3delta ex21,lacking exon 21 of the SH3/ankyrin domain gene 3 gene",
+    ]
+    strain_csv_path = pathlib.Path("./tests/user_data/subject/strain.csv")
+    write_csv(strain_content, strain_csv_path)
+
+    yield strain_content, strain_csv_path
+    strain_csv_path.unlink()
+
+
+@pytest.fixture
+def zygosity_csv():
+    """Create a 'zygosity.csv' for pytests"""
+    zygosity_content = [
+        "subject,allele,zygosity",
+        "subject5,Drd1a-Cre,Heterozygous",
+        "subject5,Gad-Cre,Present",
+        "subject6,Gad-Cre,Homozygous",
+        "subjectX,Gad-Cre,Absent",
+        "subjectY,Drd1a-Cre,Present",
+        "subjectZ,Drd1a-Cre,Present",
+    ]
+    zygosity_csv_path = pathlib.Path("./tests/user_data/subject/zygosity.csv")
+    write_csv(zygosity_content, zygosity_csv_path)
+
+    yield zygosity_content, zygosity_csv_path
+    zygosity_csv_path.unlink()
+
+
+@pytest.fixture
+def ingest_subjects(
+    pipeline,
+    ingest_lab,
+    lab_source_csv,
+    subjects_csv,
+    subjects_part_csv,
+    allele_csv,
+    cage_csv,
+    breedingpair_csv,
+    genotype_test_csv,
+    line_csv,
+    strain_csv,
+    zygosity_csv,
+):
     """From workflow_session ingest.py, import ingest_subjects, run"""
     from workflow_session.ingest import ingest_subjects
 
     _, subject_csv_path = subjects_csv
     _, subject_part_csv_path = subjects_part_csv
+    _, allele_csv_path = allele_csv
+    _, cage_csv_path = cage_csv
+    _, breedingpair_csv_path = breedingpair_csv
+    _, genotype_test_csv_path = genotype_test_csv
+    _, line_csv_path = line_csv
+    _, strain_csv_path = strain_csv
+    _, zygosity_csv_path = zygosity_csv
     ingest_subjects(
         subject_csv_path=subject_csv_path,
         subject_part_csv_path=subject_part_csv_path,
+        allele_csv_path=allele_csv_path,
+        cage_csv_path=cage_csv_path,
+        breedingpair_csv_path=breedingpair_csv_path,
+        genotype_test_csv_path=genotype_test_csv_path,
+        line_csv_path=line_csv_path,
+        strain_csv_path=strain_csv_path,
+        zygosity_csv_path=zygosity_csv_path,
         verbose=verbose,
     )
     return
 
 
-# Session data and ingestion
+# Session fixtures
 @pytest.fixture
 def sessions_csv():
     """Create a 'sessions.csv' file"""
     session_csv_path = pathlib.Path("./tests/user_data/session/sessions.csv")
     session_content = [
         "subject,project,session_datetime,session_dir,session_note,user",
-        "subject3,ProjA,2020-05-12 04:13:07,subject3\\session1,"
-        + "Data collection notes,User1",
-        "subject5,ProjA,2018-07-03 20:32:28,/subject5/session1,"
+        "subject5,ProjA,2018-07-03 20:32:28,/subject5\\session1,"
         + "Successful data collection - no notes,User1",
         "subject6,ProjA,2021-06-02 14:04:22,/subject6/session1,"
         + "Ambient temp abnormally low,User2",

@@ -54,6 +54,11 @@ __all__ = [
     "SessionExperimenter",
     "SessionNote",
     "ProjectSession",
+    "Sequence",
+    "BreedingPair",
+    "Cage",
+    "SubjectCaging",
+    "GenotypeTest",
 ]
 
 # Activate "lab", "subject", "session", "genotyping" schemas -------------

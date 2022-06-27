@@ -1,0 +1,7 @@
+subject,allele,zygosity
+subject5,Drd1a-Cre,Heterozygous
+subject5,Gad-Cre,Present
+subject6,Gad-Cre,Homozygous
+subjectX,Gad-Cre,Absent
+subjectY,Drd1a-Cre,Present
+subjectZ,Drd1a-Cre,Present
