@@ -2,7 +2,7 @@
 
 Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) convention.
 
-## [0.1.1] - Unreleased
+## [0.2.0] - 2022-07-08
 ### Added
 + Genotyping data and corresponding integration tests/notebooks
 
@@ -28,6 +28,7 @@ Observes [Semantic Versioning](https://semver.org/spec/v2.0.0.html) standard and
 ### Added
 + Added notebooks
 
+[0.2.0]: https://github.com/datajoint/workflow-session/releases/tag/0.2.0
 [0.1.0]: https://github.com/datajoint/workflow-session/releases/tag/0.1.0
 [0.0.0b2]: https://github.com/datajoint/workflow-session/tree/f91012c2391355d0b612757d55c15988636d0b9c
 [0.0.0b1]: https://github.com/datajoint/workflow-session/tree/f6d6a3353aae83ca13ff9fcc536017eb34c18f90
