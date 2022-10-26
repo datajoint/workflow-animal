@@ -4,30 +4,32 @@ from workflow_session.pipeline import lab, subject, session, genotyping
 
 
 def ingest_lab(
-    lab_csv_path="./user_data/lab/labs.csv",
-    project_csv_path="./user_data/lab/projects.csv",
-    publication_csv_path="./user_data/lab/publications.csv",
-    keyword_csv_path="./user_data/lab/keywords.csv",
-    protocol_csv_path="./user_data/lab/protocols.csv",
-    users_csv_path="./user_data/lab/users.csv",
-    project_user_csv_path="./user_data/lab/project_users.csv",
-    sources_csv_path="./user_data/lab/sources.csv",
-    skip_duplicates=True,
-    verbose=True,
+    lab_csv_path: str = "./user_data/lab/labs.csv",
+    project_csv_path: str = "./user_data/lab/projects.csv",
+    publication_csv_path: str = "./user_data/lab/publications.csv",
+    keyword_csv_path: str = "./user_data/lab/keywords.csv",
+    protocol_csv_path: str = "./user_data/lab/protocols.csv",
+    users_csv_path: str = "./user_data/lab/users.csv",
+    project_user_csv_path: str = "./user_data/lab/project_users.csv",
+    sources_csv_path: str = "./user_data/lab/sources.csv",
+    skip_duplicates: bool = True,
+    verbose: bool = True,
 ):
-    """
-    Inserts data from a CSVs into their corresponding lab schema tables.
+    """Insert data from a CSVs into their corresponding lab schema tables.
+
     By default, uses data from workflow_session/user_data/lab/
-    :param lab_csv_path:            relative path of lab csv
-    :param project_csv_path:        relative path of project csv
-    :param publication_csv_path:    relative path of publication csv
-    :param keyword_csv_path:        relative path of keyword csv
-    :param protocol_csv_path:       relative path of protocol csv
-    :param users_csv_path:          relative path of users csv
-    :param project_user_csv_path:   relative path of project users csv
-    :param sources_csv_path:        relative path of sources csv
-    :param skip_duplicates=True: datajoint insert function param
-    :param verbose: print number inserted (i.e., table length change)
+
+    Args:
+        lab_csv_path (str):            relative path of lab csv
+        project_csv_path (str):        relative path of project csv
+        publication_csv_path (str):    relative path of publication csv
+        keyword_csv_path (str):        relative path of keyword csv
+        protocol_csv_path (str):       relative path of protocol csv
+        users_csv_path (str):          relative path of users csv
+        project_user_csv_path (str):   relative path of project users csv
+        sources_csv_path (str):        relative path of sources csv
+        skip_duplicates (bool): Default True. See DataJoint `insert` function
+        verbose (bool): Print number inserted (i.e., table length change)
     """
 
     # List with repeats for when mult dj.tables fed by same CSV
@@ -66,32 +68,34 @@ def ingest_lab(
 
 
 def ingest_subjects(
-    subject_csv_path="./user_data/subject/subjects.csv",
-    subject_part_csv_path="./user_data/subject/subjects_part.csv",
-    allele_csv_path="./user_data/subject/allele.csv",
-    cage_csv_path="./user_data/subject/cage.csv",
-    breedingpair_csv_path="./user_data/subject/breedingpair.csv",
-    genotype_test_csv_path="./user_data/subject/genotype_test.csv",
-    line_csv_path="./user_data/subject/line.csv",
-    strain_csv_path="./user_data/subject/strain.csv",
-    zygosity_csv_path="./user_data/subject/zygosity.csv",
-    skip_duplicates=True,
-    verbose=True,
+    subject_csv_path: str = "./user_data/subject/subjects.csv",
+    subject_part_csv_path: str = "./user_data/subject/subjects_part.csv",
+    allele_csv_path: str = "./user_data/subject/allele.csv",
+    cage_csv_path: str = "./user_data/subject/cage.csv",
+    breedingpair_csv_path: str = "./user_data/subject/breedingpair.csv",
+    genotype_test_csv_path: str = "./user_data/subject/genotype_test.csv",
+    line_csv_path: str = "./user_data/subject/line.csv",
+    strain_csv_path: str = "./user_data/subject/strain.csv",
+    zygosity_csv_path: str = "./user_data/subject/zygosity.csv",
+    skip_duplicates: bool = True,
+    verbose: bool = True,
 ):
-    """
-    Inserts data from a subject csv into corresponding subject schema tables
+    """Insert data from a subject csv into corresponding subject schema tables
+
     By default, uses data from workflow_session/user_data/subject/
-    :param subject_csv_path:        relative path of csv for subject data
-    :param subject_part_csv_path:   relative path of csv for subject part tables
-    :param allele_csv_path:         relative path of csv for alleles
-    :param cage_csv_path:           relative path of csv for cages
-    :param breedingpair_csv_path:   relative path of csv for breeding pairs
-    :param genotype_test_csv_path:  relative path of csv for genotype
-    :param line_csv_path:           relative path of csv for line
-    :param strain_csv_path:         relative path of csv for strain
-    :param zygosity_csv_path:       relative path of csv for zygotsky
-    :param skip_duplicates=True: datajoint insert function param
-    :param verbose: print number inserted (i.e., table length change)
+
+    Args:
+        subject_csv_path (str):        relative path of csv for subject data
+        subject_part_csv_path (str):   relative path of csv for subject part tables
+        allele_csv_path (str):         relative path of csv for alleles
+        cage_csv_path (str):           relative path of csv for cages
+        breedingpair_csv_path (str):   relative path of csv for breeding pairs
+        genotype_test_csv_path (str):  relative path of csv for genotype
+        line_csv_path (str):           relative path of csv for line
+        strain_csv_path (str):         relative path of csv for strain
+        zygosity_csv_path (str):       relative path of csv for zygotsky
+        skip_duplicates (bool): Default True. See DataJoint `insert` function
+        verbose (bool): Print number inserted (i.e., table length change)
     """
     csvs = [
         subject_csv_path,  # 0
@@ -154,16 +158,16 @@ def ingest_subjects(
 
 
 def ingest_sessions(
-    session_csv_path="./user_data/session/sessions.csv",
-    skip_duplicates=True,
-    verbose=True,
+    session_csv_path: str = "./user_data/session/sessions.csv",
+    skip_duplicates: bool = True,
+    verbose: bool = True,
 ):
     """
     Inserts data from a sessions csv into corresponding session schema tables
     By default, uses data from workflow_session/user_data/session/
-    :param session_csv_path:     relative path of session csv
-    :param skip_duplicates=True: datajoint insert function param
-    :param verbose: print number inserted (i.e., table length change)
+        session_csv_path (str):     relative path of session csv
+        skip_duplicates (bool): Default True. See DataJoint `insert` function
+        verbose (bool): Print number inserted (i.e., table length change)
     """
     csvs = [
         session_csv_path,
